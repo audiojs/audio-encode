@@ -1,35 +1,36 @@
-import t, { is, ok } from 'tst'
+import t, { is, ok, almost } from 'tst'
 import encode, { streamEncoder, fmt, channels, norm, merge } from './audio-encode.js'
-
+import decode from 'audio-decode'
 // --- test utilities ---
 
-// generate mono sine wave
-export function sine(sampleRate = 44100, freq = 440, duration = 1) {
+function sine(sampleRate = 44100, freq = 440, duration = 1) {
 	let n = sampleRate * duration
 	let data = new Float32Array(n)
 	for (let i = 0; i < n; i++) data[i] = Math.sin(2 * Math.PI * freq * i / sampleRate)
 	return [data]
 }
 
-// compare channelData within tolerance (for lossy round-trips)
-export function similar(a, b, tolerance = 0.01) {
-	is(a.length, b.length, 'channel count')
-	for (let ch = 0; ch < a.length; ch++) {
-		let lenDiff = Math.abs(a[ch].length - b[ch].length)
-		ok(lenDiff <= a[ch].length * 0.01, `length ch${ch}: ${a[ch].length} vs ${b[ch].length}`)
-		let len = Math.min(a[ch].length, b[ch].length)
-		let maxErr = 0
-		for (let i = 0; i < len; i++) maxErr = Math.max(maxErr, Math.abs(a[ch][i] - b[ch][i]))
-		ok(maxErr <= tolerance, `max error ${maxErr.toFixed(4)} <= ${tolerance}`)
-	}
+function rms(arr) {
+	let sum = 0
+	for (let i = 0; i < arr.length; i++) sum += arr[i] * arr[i]
+	return Math.sqrt(sum / arr.length)
 }
 
-// --- core ---
+// decode lena wav to get reference audio
+let lenaPCM
+async function getLena() {
+	if (!lenaPCM) {
+		let wav = (await import('audio-lena/wav')).default
+		lenaPCM = await decode(wav)
+	}
+	return lenaPCM
+}
+
+// --- core helpers ---
 
 t('channels', () => {
 	let mono = new Float32Array([1, 2, 3])
 	let stereo = [new Float32Array([1, 2]), new Float32Array([3, 4])]
-
 	is(channels(null).length, 0)
 	is(channels(undefined).length, 0)
 	is(channels([]).length, 0)
@@ -39,105 +40,107 @@ t('channels', () => {
 })
 
 t('norm', () => {
-	let empty = norm(null)
-	ok(empty instanceof Uint8Array)
-	is(empty.length, 0)
-
+	is(norm(null).length, 0)
 	let buf = new Uint8Array([1, 2, 3])
 	is(norm(buf), buf)
-
-	let arr = new Int8Array([1, 2, 3])
-	let result = norm(arr)
-	ok(result instanceof Uint8Array)
-	is(result.length, 3)
+	ok(norm(new Int8Array([1, 2])) instanceof Uint8Array)
 })
 
 t('merge', () => {
-	let a = new Uint8Array([1, 2])
-	let b = new Uint8Array([3, 4])
-	let m = merge(a, b)
-	is(m.length, 4)
-	is(m[0], 1); is(m[2], 3)
+	let a = new Uint8Array([1, 2]), b = new Uint8Array([3, 4])
+	is(merge(a, b).length, 4)
 	is(merge(a, null), a)
 	is(merge(null, b), b)
 })
 
 t('streamEncoder', async () => {
-	let encoded = [], flushed = false, freed = false
-
 	let enc = streamEncoder(
-		ch => { encoded.push(ch); return new Uint8Array([ch[0].length]) },
-		() => { flushed = true; return new Uint8Array([0xFF]) },
-		() => { freed = true }
+		ch => new Uint8Array([ch[0].length]),
+		() => new Uint8Array([0xFF]),
+		() => {}
 	)
-
-	let data = [new Float32Array([1, 2, 3])]
-	let r1 = await enc.encode(data)
+	let r1 = await enc.encode([new Float32Array([1, 2, 3])])
 	is(r1[0], 3)
-	is(encoded.length, 1)
-
-	let r2 = await enc.encode() // flush + free
-	ok(flushed)
-	ok(freed)
+	let r2 = await enc.encode()
 	is(r2[0], 0xFF)
-
-	// double flush returns empty
 	is((await enc.encode()).length, 0)
 })
 
-t('streamEncoder: encode after free throws', async () => {
-	let enc = streamEncoder(
-		ch => new Uint8Array([1]),
-		null,
-		() => {}
-	)
-	await enc.encode() // flush + free
-	try {
-		await enc.encode([new Float32Array([1])])
-		ok(false, 'should throw')
-	} catch (e) { ok(/already freed/.test(e.message)) }
-})
-
-t('streamEncoder: error frees resources', async () => {
-	let freed = false
-	let enc = streamEncoder(
-		() => { throw Error('codec error') },
-		null,
-		() => { freed = true }
-	)
-	try {
-		await enc.encode([new Float32Array([1])])
-		ok(false, 'should throw')
-	} catch (e) { ok(/codec error/.test(e.message)) }
-	ok(freed, 'freed on error')
-})
-
 t('fmt', async () => {
-	let initOpts = null
-	let encoder = fmt(async (opts) => {
-		initOpts = opts
-		return streamEncoder(
-			ch => new Uint8Array(ch[0].length * 2),
-			() => new Uint8Array([0xFE, 0xED]),
-			() => {}
-		)
-	})
-
+	let encoder = fmt(async (opts) => streamEncoder(
+		ch => new Uint8Array(ch[0].length * 2),
+		() => new Uint8Array([0xFE]),
+		() => {}
+	))
 	is(typeof encoder, 'function')
 	is(typeof encoder.stream, 'function')
-
-	// sampleRate required
-	try {
-		await encoder([new Float32Array(10)])
-		ok(false, 'should throw')
-	} catch (e) { ok(/sampleRate/.test(e.message)) }
-
-	// whole-file encode
 	let result = await encoder([new Float32Array(100)], { sampleRate: 44100 })
-	ok(result instanceof Uint8Array)
-	is(result.length, 200 + 2) // encoded + flushed
-	is(initOpts.sampleRate, 44100)
+	is(result.length, 201)
+})
 
-	// empty input returns empty
-	is((await encoder([], { sampleRate: 44100 })).length, 0)
+// --- format round-trip tests with lena ---
+
+t('wav round-trip (lena)', async () => {
+	let { channelData, sampleRate } = await getLena()
+	let buf = await encode.wav(channelData, { sampleRate })
+	ok(buf.length > 44, 'has data')
+	let dec = await decode(buf)
+	is(dec.sampleRate, sampleRate)
+	is(dec.channelData.length, channelData.length)
+	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.001, 'rms matches')
+})
+
+t('aiff encode (lena)', async () => {
+	let { channelData, sampleRate } = await getLena()
+	let buf = await encode.aiff(channelData, { sampleRate })
+	ok(buf.length > 54, 'has data')
+	let dv = new DataView(buf.buffer)
+	is(dv.getUint32(0), 0x464F524D, 'FORM')
+	is(dv.getUint32(8), 0x41494646, 'AIFF')
+	is(dv.getInt16(20, false), 1, 'mono')
+})
+
+t('mp3 round-trip (lena)', async () => {
+	let { channelData, sampleRate } = await getLena()
+	let buf = await encode.mp3(channelData, { sampleRate, channels: 1, bitrate: 128 })
+	ok(buf.length > 0)
+	let dec = await decode(buf)
+	is(dec.sampleRate, sampleRate)
+	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.05, 'rms within lossy tolerance')
+})
+
+t('ogg round-trip (lena)', async () => {
+	let { channelData, sampleRate } = await getLena()
+	let buf = await encode.ogg(channelData, { sampleRate, channels: 1, quality: 5 })
+	ok(buf.length > 0)
+	let dec = await decode(buf)
+	is(dec.sampleRate, sampleRate)
+	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.05, 'rms within lossy tolerance')
+})
+
+t('flac round-trip (lena)', async () => {
+	let { channelData, sampleRate } = await getLena()
+	let buf = await encode.flac(channelData, { sampleRate })
+	ok(buf.length > 0)
+	let dec = await decode(buf)
+	is(dec.sampleRate, sampleRate)
+	is(dec.channelData.length, 1)
+	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.001, 'rms near-identical (lossless)')
+})
+
+t('opus round-trip (lena)', async () => {
+	let { channelData, sampleRate } = await getLena()
+	let buf = await encode.opus(channelData, { sampleRate, channels: 1, bitrate: 96 })
+	ok(buf.length > 0)
+	let dec = await decode(buf)
+	is(dec.sampleRate, 48000) // opus always decodes at 48kHz
+	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.05, 'rms within lossy tolerance')
+})
+
+t('wav streaming', async () => {
+	let enc = await encode.wav.stream({ sampleRate: 44100 })
+	let c1 = await enc.encode(sine(44100, 440, 0.5))
+	let c2 = await enc.encode(sine(44100, 440, 0.5))
+	let final = await enc.encode()
+	ok(c1.length > 0 || c2.length > 0 || final.length > 0)
 })

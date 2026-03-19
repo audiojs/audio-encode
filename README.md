@@ -16,14 +16,12 @@ const buf = await encode.wav(channelData, { sampleRate: 44100 });
 
 | Format | Package | Engine |
 |--------|---------|--------|
-| WAV | built-in | JS |
-| MP3 | [wasm-media-encoders](https://github.com/nicodemus26/wasm-media-encoders) | WASM |
-| OGG Vorbis | [wasm-media-encoders](https://github.com/nicodemus26/wasm-media-encoders) | WASM |
-| Opus | TBD | WASM |
-| FLAC | [libflac.js](https://github.com/nicodemus26/libflac.js) | WASM |
-| AAC / M4A | TBD | WASM |
-| AIFF | built-in | JS |
-| WebM | TBD | WASM |
+| WAV | [@audio/wav-encode](https://github.com/audiojs/wav-encode) | JS |
+| MP3 | [@audio/mp3-encode](https://github.com/audiojs/mp3-encode) | WASM |
+| OGG Vorbis | [@audio/ogg-encode](https://github.com/audiojs/ogg-encode) | WASM |
+| Opus | [@audio/opus-encode](https://github.com/audiojs/opus-encode) | WASM |
+| FLAC | [@audio/flac-encode](https://github.com/audiojs/flac-encode) | WASM |
+| AIFF | [@audio/aiff-encode](https://github.com/audiojs/aiff-encode) | JS |
 
 ### Whole-file encode
 
@@ -32,9 +30,12 @@ Specify the format as method name. Input is _Float32Array[]_ (one per channel) o
 ```js
 import encode from 'audio-encode';
 
-const wav = await encode.wav(channelData, { sampleRate: 44100 });
-const mp3 = await encode.mp3(channelData, { sampleRate: 44100, bitrate: 128 });
-const ogg = await encode.ogg(channelData, { sampleRate: 44100, quality: 5 });
+const wav  = await encode.wav(channelData, { sampleRate: 44100 });
+const aiff = await encode.aiff(channelData, { sampleRate: 44100 });
+const mp3  = await encode.mp3(channelData, { sampleRate: 44100, bitrate: 128 });
+const ogg  = await encode.ogg(channelData, { sampleRate: 44100, quality: 5 });
+const flac = await encode.flac(channelData, { sampleRate: 44100 });
+const opus = await encode.opus(channelData, { sampleRate: 48000, bitrate: 96 });
 ```
 
 ### Stream encoding
@@ -59,9 +60,12 @@ const c = await encoder.encode();        // end of stream — flush + free
 | Option | Description | Applies to |
 |--------|-------------|------------|
 | `sampleRate` | Output sample rate (required) | all |
-| `bitrate` | Target bitrate in kbps | mp3, aac, opus |
+| `bitrate` | Target bitrate in kbps | mp3, opus |
 | `quality` | Quality 0–10 (VBR) | ogg, mp3 |
 | `channels` | Output channel count | all |
+| `bitDepth` | Bit depth: 16 or 32 (wav), 16 or 24 (aiff, flac) | wav, aiff, flac |
+| `compression` | FLAC compression level 0–8 | flac |
+| `application` | `'audio'`, `'voip'`, or `'lowdelay'` | opus |
 
 ### Custom encoders
 

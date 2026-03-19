@@ -18,6 +18,12 @@ export interface EncodeOptions {
 	bitrate?: number;
 	/** Quality 0-10 (VBR, format-specific). */
 	quality?: number;
+	/** Bit depth: 16|32 for wav, 16|24 for aiff/flac. */
+	bitDepth?: number;
+	/** FLAC compression level 0-8. */
+	compression?: number;
+	/** Opus application: 'audio', 'voip', 'lowdelay'. */
+	application?: string;
 	[key: string]: any;
 }
 
@@ -26,8 +32,13 @@ export interface FormatEncoder {
 	stream(opts: EncodeOptions): Promise<StreamEncoder>;
 }
 
-/** Encoder registry. Formats attached as encode.wav, encode.mp3, etc. */
 declare const encode: {
+	wav: FormatEncoder;
+	aiff: FormatEncoder;
+	mp3: FormatEncoder;
+	ogg: FormatEncoder;
+	flac: FormatEncoder;
+	opus: FormatEncoder;
 	[format: string]: FormatEncoder;
 };
 
@@ -39,17 +50,3 @@ export function streamEncoder(
 	onFlush?: (() => Uint8Array | Promise<Uint8Array>) | null,
 	onFree?: (() => void) | null
 ): StreamEncoder;
-
-/** Wrap a stream factory into whole-file encoder + .stream property. */
-export function fmt(
-	init: (opts: EncodeOptions) => Promise<StreamEncoder>
-): FormatEncoder;
-
-/** Normalize input to Float32Array[]. */
-export function channels(data: Float32Array[] | Float32Array | null): Float32Array[];
-
-/** Ensure result is Uint8Array. */
-export function norm(r: any): Uint8Array;
-
-/** Concatenate two Uint8Arrays. */
-export function merge(a: Uint8Array, b: Uint8Array): Uint8Array;

@@ -1,6 +1,6 @@
 {
   "name": "audio-encode",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Encode audio data in node or browser",
   "type": "module",
   "main": "audio-encode.js",
@@ -13,6 +13,11 @@
     },
     "./package.json": "./package.json"
   },
+  "files": [
+    "audio-encode.js",
+    "audio-encode.d.ts",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "node test.js"
   },
@@ -31,10 +36,7 @@
     "vorbis",
     "opus",
     "flac",
-    "aac",
-    "m4a",
     "aiff",
-    "webm",
     "pcm",
     "streaming"
   ],
@@ -44,8 +46,17 @@
     "url": "https://github.com/audiojs/audio-encode/issues"
   },
   "homepage": "https://github.com/audiojs/audio-encode#readme",
+  "dependencies": {
+    "@audio/aiff-encode": "^1.0.0",
+    "@audio/flac-encode": "^1.0.0",
+    "@audio/mp3-encode": "^1.0.0",
+    "@audio/ogg-encode": "^1.0.0",
+    "@audio/opus-encode": "^1.0.0",
+    "@audio/wav-encode": "^1.0.0"
+  },
   "devDependencies": {
-    "audio-decode": "^3.1.3",
+    "audio-decode": "^4.0.0",
+    "audio-lena": "^3.0.0",
     "tst": "^9.2.2"
   }
 }

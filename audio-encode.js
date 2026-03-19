@@ -16,8 +16,20 @@ export default encode
 
 // --- format registration ---
 
-// encode.wav = fmt(async (opts) => streamEncoder(...))
-// encode.mp3 = fmt(async (opts) => streamEncoder(...))
+function reg(name, load) {
+	encode[name] = fmt(async (opts) => {
+		let init = (await load()).default
+		let codec = await init(opts)
+		return streamEncoder(ch => codec.encode(ch), () => codec.flush(), () => codec.free())
+	})
+}
+
+reg('wav', () => import('@audio/wav-encode'))
+reg('aiff', () => import('@audio/aiff-encode'))
+reg('mp3', () => import('@audio/mp3-encode'))
+reg('ogg', () => import('@audio/ogg-encode'))
+reg('flac', () => import('@audio/flac-encode'))
+reg('opus', () => import('@audio/opus-encode'))
 
 /**
  * Wrap a stream factory into whole-file encoder + .stream
@@ -107,3 +119,4 @@ function merge(a, b) {
 }
 
 export { fmt, channels, norm, merge }
+

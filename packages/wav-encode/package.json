@@ -1,0 +1,43 @@
+{
+  "name": "@audio/wav-encode",
+  "version": "1.0.0",
+  "description": "Encode PCM audio samples to WAV format",
+  "type": "module",
+  "main": "wav-encode.js",
+  "types": "wav-encode.d.ts",
+  "exports": {
+    ".": "./wav-encode.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "wav-encode.js",
+    "wav-encode.d.ts",
+    "LICENSE"
+  ],
+  "keywords": [
+    "wav",
+    "wave",
+    "riff",
+    "audio",
+    "encode",
+    "encoder",
+    "pcm"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "audiojs",
+  "homepage": "https://github.com/audiojs/wav-encode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/audiojs/wav-encode.git"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "bugs": "https://github.com/audiojs/wav-encode/issues",
+  "scripts": {
+    "test": "node test.js"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "@audio/opus-encode",
+  "version": "1.0.0",
+  "description": "Encode PCM audio samples to Ogg Opus format via WASM",
+  "type": "module",
+  "main": "opus-encode.js",
+  "types": "opus-encode.d.ts",
+  "exports": {
+    ".": "./opus-encode.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "opus-encode.js",
+    "opus-encode.d.ts",
+    "LICENSE"
+  ],
+  "keywords": [
+    "opus",
+    "ogg",
+    "audio",
+    "encode",
+    "encoder",
+    "wasm"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "audiojs",
+  "homepage": "https://github.com/audiojs/opus-encode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/audiojs/opus-encode.git"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "bugs": "https://github.com/audiojs/opus-encode/issues",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "opusscript": "^0.1.1"
+  }
+}

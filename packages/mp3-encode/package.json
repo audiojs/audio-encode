@@ -1,0 +1,45 @@
+{
+  "name": "@audio/mp3-encode",
+  "version": "1.0.0",
+  "description": "Encode PCM audio samples to MP3 format via WASM",
+  "type": "module",
+  "main": "mp3-encode.js",
+  "types": "mp3-encode.d.ts",
+  "exports": {
+    ".": "./mp3-encode.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "mp3-encode.js",
+    "mp3-encode.d.ts",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mp3",
+    "lame",
+    "audio",
+    "encode",
+    "encoder",
+    "wasm"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "audiojs",
+  "homepage": "https://github.com/audiojs/mp3-encode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/audiojs/mp3-encode.git"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "bugs": "https://github.com/audiojs/mp3-encode/issues",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "wasm-media-encoders": "^0.7.0"
+  }
+}

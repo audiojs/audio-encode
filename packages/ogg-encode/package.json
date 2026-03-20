@@ -1,0 +1,45 @@
+{
+  "name": "@audio/ogg-encode",
+  "version": "1.0.0",
+  "description": "Encode PCM audio samples to OGG Vorbis format via WASM",
+  "type": "module",
+  "main": "ogg-encode.js",
+  "types": "ogg-encode.d.ts",
+  "exports": {
+    ".": "./ogg-encode.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "ogg-encode.js",
+    "ogg-encode.d.ts",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ogg",
+    "vorbis",
+    "audio",
+    "encode",
+    "encoder",
+    "wasm"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "author": "audiojs",
+  "homepage": "https://github.com/audiojs/ogg-encode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/audiojs/ogg-encode.git"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "bugs": "https://github.com/audiojs/ogg-encode/issues",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "wasm-media-encoders": "^0.7.0"
+  }
+}

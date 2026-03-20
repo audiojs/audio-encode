@@ -18,8 +18,12 @@
     "audio-encode.d.ts",
     "LICENSE"
   ],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "test:all": "npm test --workspaces && npm test"
   },
   "repository": {
     "type": "git",

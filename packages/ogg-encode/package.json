@@ -27,15 +27,16 @@
   },
   "license": "MIT",
   "author": "audiojs",
-  "homepage": "https://github.com/audiojs/ogg-encode#readme",
+  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/ogg-encode",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/audiojs/ogg-encode.git"
+    "url": "git+https://github.com/audiojs/audio-encode.git",
+    "directory": "packages/ogg-encode"
   },
   "engines": {
     "node": ">=16"
   },
-  "bugs": "https://github.com/audiojs/ogg-encode/issues",
+  "bugs": "https://github.com/audiojs/audio-encode/issues",
   "scripts": {
     "test": "node test.js"
   },

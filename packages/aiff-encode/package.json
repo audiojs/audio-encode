@@ -26,15 +26,16 @@
   },
   "license": "MIT",
   "author": "audiojs",
-  "homepage": "https://github.com/audiojs/aiff-encode#readme",
+  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/aiff-encode",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/audiojs/aiff-encode.git"
+    "url": "git+https://github.com/audiojs/audio-encode.git",
+    "directory": "packages/aiff-encode"
   },
   "engines": {
     "node": ">=16"
   },
-  "bugs": "https://github.com/audiojs/aiff-encode/issues",
+  "bugs": "https://github.com/audiojs/audio-encode/issues",
   "scripts": {
     "test": "node test.js"
   }

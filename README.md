@@ -4,10 +4,10 @@ Encode raw audio samples to any format.<br>
 JS / WASM – no ffmpeg, no native bindings, works in both node and browser.<br>
 Small API, minimal size, near-native performance, stream encoding.
 
-[![npm install audio-encode](https://nodei.co/npm/audio-encode.png?mini=true)](https://npmjs.org/package/audio-encode/)
+[![npm install encode-audio](https://nodei.co/npm/encode-audio.png?mini=true)](https://npmjs.org/package/encode-audio/)
 
 ```js
-import encode from 'audio-encode';
+import encode from 'encode-audio';
 
 const buf = await encode.wav(channelData, { sampleRate: 44100 });
 ```
@@ -16,19 +16,19 @@ const buf = await encode.wav(channelData, { sampleRate: 44100 });
 
 | Format | Package | Engine |
 |--------|---------|--------|
-| WAV | [@audio/wav-encode](https://github.com/audiojs/wav-encode) | JS |
-| MP3 | [@audio/mp3-encode](https://github.com/audiojs/mp3-encode) | WASM |
-| OGG Vorbis | [@audio/ogg-encode](https://github.com/audiojs/ogg-encode) | WASM |
-| Opus | [@audio/opus-encode](https://github.com/audiojs/opus-encode) | WASM |
-| FLAC | [@audio/flac-encode](https://github.com/audiojs/flac-encode) | WASM |
-| AIFF | [@audio/aiff-encode](https://github.com/audiojs/aiff-encode) | JS |
+| WAV | [@audio/wav-encode](https://npmjs.com/package/@audio/wav-encode) | JS |
+| MP3 | [@audio/mp3-encode](https://npmjs.com/package/@audio/mp3-encode) | WASM |
+| OGG Vorbis | [@audio/ogg-encode](https://npmjs.com/package/@audio/ogg-encode) | WASM |
+| Opus | [@audio/opus-encode](https://npmjs.com/package/@audio/opus-encode) | WASM |
+| FLAC | [@audio/flac-encode](https://npmjs.com/package/@audio/flac-encode) | WASM |
+| AIFF | [@audio/aiff-encode](https://npmjs.com/package/@audio/aiff-encode) | JS |
 
 ### Whole-file encode
 
-Specify the format as method name. Input is _Float32Array[]_ (one per channel) or a single _Float32Array_ (mono).
+Specify the format as method name. Input is _Float32Array[]_ (one per channel), a single _Float32Array_ (mono), or an [AudioBuffer](https://npmjs.com/package/audio-buffer).
 
 ```js
-import encode from 'audio-encode';
+import encode from 'encode-audio';
 
 const wav  = await encode.wav(channelData, { sampleRate: 44100 });
 const aiff = await encode.aiff(channelData, { sampleRate: 44100 });
@@ -43,7 +43,7 @@ const opus = await encode.opus(channelData, { sampleRate: 48000, bitrate: 96 });
 For chunk-by-chunk encoding, use `.stream()`:
 
 ```js
-import encode from 'audio-encode';
+import encode from 'encode-audio';
 
 const encoder = await encode.mp3.stream({ sampleRate: 44100, bitrate: 128 });
 
@@ -72,7 +72,7 @@ const c = await encoder.encode();        // end of stream — flush + free
 The `encode` registry is extensible:
 
 ```js
-import encode from 'audio-encode';
+import encode from 'encode-audio';
 encode.myformat = Object.assign(
   async (data, opts) => { /* ... */ },
   { stream: async (opts) => ({ encode: chunk => ..., free() {} }) }
@@ -82,9 +82,8 @@ encode.myformat = Object.assign(
 ## See also
 
 * [audio-decode](https://github.com/audiojs/audio-decode) – decode any audio format to raw samples.
-* [wasm-media-encoders](https://github.com/nicodemus26/wasm-media-encoders) – compact WASM MP3 & Vorbis encoders.
+* [wasm-media-encoders](https://github.com/arseneyr/wasm-media-encoders) – compact WASM MP3 & Vorbis encoders.
 * [AudioEncoder](https://developer.mozilla.org/en-US/docs/Web/API/AudioEncoder) – native WebCodecs encoder API.
-* [ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm) – full encoding/decoding library.
 
 ## License
 

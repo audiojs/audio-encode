@@ -1,6 +1,6 @@
 /**
  * Audio encoder: whole-file and streaming
- * @module audio-encode
+ * @module encode-audio
  *
  * let buf = await encode.wav(channelData, { sampleRate: 44100 })
  *
@@ -59,6 +59,12 @@ function channels(data) {
 		return []
 	}
 	if (data instanceof Float32Array) return [data]
+	// AudioBuffer or AudioBuffer-like ({ numberOfChannels, getChannelData })
+	if (data.getChannelData && data.numberOfChannels) {
+		let ch = []
+		for (let i = 0; i < data.numberOfChannels; i++) ch.push(data.getChannelData(i))
+		return ch
+	}
 	return []
 }
 
@@ -117,6 +123,4 @@ function merge(a, b) {
 	out.set(b, a.length)
 	return out
 }
-
-export { fmt, channels, norm, merge }
 

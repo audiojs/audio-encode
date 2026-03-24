@@ -1,5 +1,6 @@
 import t, { is, ok, almost } from 'tst'
 import encode from './audio-encode.js'
+import encodeStream from './stream.js'
 import decode from 'audio-decode'
 import AudioBuffer from 'audio-buffer'
 
@@ -94,6 +95,18 @@ t('streaming (deprecated .stream/.encode)', async () => {
 	let c2 = await enc.encode(sine(44100, 440, 0.5))
 	let final = await enc.encode()
 	ok(c1.length > 0 || c2.length > 0 || final.length > 0)
+})
+
+t('TransformStream', async () => {
+	let chunks = [sine(44100, 440, 0.5), sine(44100, 440, 0.5)]
+	let source = new ReadableStream({
+		pull(ctrl) { chunks.length ? ctrl.enqueue(chunks.shift()) : ctrl.close() }
+	})
+	let out = []
+	let dest = new WritableStream({ write(chunk) { out.push(chunk) } })
+	await source.pipeThrough(encodeStream('wav', { sampleRate: 44100 })).pipeTo(dest)
+	ok(out.length > 0, 'produced chunks')
+	ok(out.every(c => c instanceof Uint8Array), 'all Uint8Array')
 })
 
 t('AudioBuffer input', async () => {

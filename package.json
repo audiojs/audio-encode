@@ -11,11 +11,14 @@
       "node": "./audio-encode.js",
       "default": "./audio-encode.js"
     },
+    "./stream": "./stream.js",
     "./package.json": "./package.json"
   },
   "files": [
     "audio-encode.js",
     "audio-encode.d.ts",
+    "stream.js",
+    "stream.d.ts",
     "LICENSE"
   ],
   "workspaces": [

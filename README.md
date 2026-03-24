@@ -38,7 +38,7 @@ const flac = await encode.flac(channelData, { sampleRate: 44100 });
 const opus = await encode.opus(channelData, { sampleRate: 48000, bitrate: 96 });
 ```
 
-### Stream encoding
+### Chunked encoding
 
 Call with just options (no data) to create a streaming encoder:
 
@@ -49,9 +49,19 @@ const enc = await encode.mp3({ sampleRate: 44100, bitrate: 128 });
 
 const a = await enc(chunk1);  // Uint8Array
 const b = await enc(chunk2);
-const c = await enc();        // end of stream — flush + free
+const c = await enc(null);        // end of stream — flush + free
 
 // explicit control: enc.flush(), enc.free()
+```
+
+### TransformStream
+
+```js
+import encodeStream from 'encode-audio/stream';
+
+audioSource
+  .pipeThrough(encodeStream('mp3', { sampleRate: 44100, bitrate: 128 }))
+  .pipeTo(destination);
 ```
 
 ### Options
@@ -66,17 +76,6 @@ const c = await enc();        // end of stream — flush + free
 | `compression` | FLAC compression level 0–8 | flac |
 | `application` | `'audio'`, `'voip'`, or `'lowdelay'` | opus |
 
-### Custom encoders
-
-The `encode` registry is extensible:
-
-```js
-import encode from 'encode-audio';
-encode.myformat = Object.assign(
-  async (data, opts) => { /* ... */ },
-  { stream: async (opts) => ({ encode: chunk => ..., free() {} }) }
-);
-```
 
 ## See also
 

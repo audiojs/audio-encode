@@ -1,13 +1,4 @@
-export interface StreamEncoder {
-	/** Encode a chunk of audio. */
-	encode(channelData: Float32Array[] | Float32Array): Promise<Uint8Array>;
-	/** Flush remaining data, finalize, and free resources. */
-	encode(): Promise<Uint8Array>;
-	/** Flush without freeing. */
-	flush(): Promise<Uint8Array>;
-	/** Free resources without flushing. */
-	free(): void;
-}
+type AudioInput = Float32Array[] | Float32Array | { numberOfChannels: number; getChannelData(i: number): Float32Array };
 
 export interface EncodeOptions {
 	/** Output sample rate (required). */
@@ -27,8 +18,25 @@ export interface EncodeOptions {
 	[key: string]: any;
 }
 
+export interface StreamEncoder {
+	/** Encode a chunk of audio. */
+	(channelData: AudioInput): Promise<Uint8Array>;
+	/** Flush remaining data, finalize, and free resources. */
+	(): Promise<Uint8Array>;
+	/** @deprecated Use enc() instead. */
+	encode(channelData?: AudioInput): Promise<Uint8Array>;
+	/** Flush without freeing. */
+	flush(): Promise<Uint8Array>;
+	/** Free resources without flushing. */
+	free(): void;
+}
+
 export interface FormatEncoder {
-	(channelData: Float32Array[] | Float32Array, opts: EncodeOptions): Promise<Uint8Array>;
+	/** Whole-file encode. */
+	(channelData: AudioInput, opts: EncodeOptions): Promise<Uint8Array>;
+	/** Create streaming encoder. */
+	(opts: EncodeOptions): Promise<StreamEncoder>;
+	/** @deprecated Use encode.fmt(opts) instead. */
 	stream(opts: EncodeOptions): Promise<StreamEncoder>;
 }
 

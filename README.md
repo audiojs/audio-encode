@@ -40,19 +40,18 @@ const opus = await encode.opus(channelData, { sampleRate: 48000, bitrate: 96 });
 
 ### Stream encoding
 
-For chunk-by-chunk encoding, use `.stream()`:
+Call with just options (no data) to create a streaming encoder:
 
 ```js
 import encode from 'encode-audio';
 
-const encoder = await encode.mp3.stream({ sampleRate: 44100, bitrate: 128 });
+const enc = await encode.mp3({ sampleRate: 44100, bitrate: 128 });
 
-const a = await encoder.encode(chunk1);  // Uint8Array
-const b = await encoder.encode(chunk2);
-const c = await encoder.encode();        // end of stream — flush + free
+const a = await enc(chunk1);  // Uint8Array
+const b = await enc(chunk2);
+const c = await enc();        // end of stream — flush + free
 
-// explicit methods
-// encoder.flush(), encoder.free()
+// explicit control: enc.flush(), enc.free()
 ```
 
 ### Options

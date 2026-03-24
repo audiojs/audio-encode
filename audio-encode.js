@@ -4,9 +4,9 @@
  *
  * let buf = await encode.wav(channelData, { sampleRate: 44100 })
  *
- * let enc = await encode.mp3.stream({ sampleRate: 44100, bitrate: 128 })
- * let chunk = enc.encode(channelData)
- * let final = enc.encode() // flush + free
+ * let enc = await encode.mp3({ sampleRate: 44100, bitrate: 128 })
+ * let chunk = await enc(channelData)
+ * let final = await enc() // flush + free
  */
 
 const EMPTY = new Uint8Array(0)
@@ -32,21 +32,26 @@ reg('flac', () => import('@audio/flac-encode'))
 reg('opus', () => import('@audio/opus-encode'))
 
 /**
- * Wrap a stream factory into whole-file encoder + .stream
- * @param {function} init - async (opts) => StreamEncoder
+ * Wrap a stream factory into whole-file encoder + streaming
+ * 1 arg (opts) → streaming encoder function
+ * 2 args (data, opts) → whole-file encode
  */
 function fmt(init) {
-	let fn = async (data, opts = {}) => {
+	let fn = async (data, opts) => {
+		// 1 arg = streaming: encode.mp3({ sampleRate })
+		if (!opts) return init(data)
+		// 2 args = whole-file: encode.mp3(channelData, { sampleRate })
 		if (!opts.sampleRate) throw Error('sampleRate is required')
 		let ch = channels(data)
 		if (!ch.length || !ch[0].length) return EMPTY
 		let enc = await init(opts)
 		try {
-			let result = await enc.encode(ch)
-			let flushed = await enc.encode()
+			let result = await enc(ch)
+			let flushed = await enc()
 			return merge(result, flushed)
 		} catch (e) { enc.free(); throw e }
 	}
+	// TODO: remove .stream in next major
 	fn.stream = init
 	return fn
 }
@@ -69,41 +74,42 @@ function channels(data) {
 }
 
 /**
- * StreamEncoder:
- * .encode(channelData) — encode audio, returns Uint8Array
- * .encode()            — flush + finalize + free
- * .flush()             — flush without freeing
- * .free()              — release without flushing
+ * StreamEncoder — a callable function:
+ * enc(channelData) — encode audio, returns Uint8Array
+ * enc()            — flush + finalize + free
+ * enc.flush()      — flush without freeing
+ * enc.free()       — release without flushing
  */
 export function streamEncoder(onEncode, onFlush, onFree) {
 	let done = false
-	return {
-		async encode(data) {
-			if (data) {
-				if (done) throw Error('Encoder already freed')
-				let ch = channels(data)
-				try { return norm(await onEncode(ch)) }
-				catch (e) { done = true; onFree?.(); throw e }
-			}
-			// no args = end of stream
-			if (done) return EMPTY
-			done = true
-			try {
-				let result = onFlush ? norm(await onFlush()) : EMPTY
-				onFree?.()
-				return result
-			} catch (e) { onFree?.(); throw e }
-		},
-		async flush() {
-			if (done) return EMPTY
-			return onFlush ? norm(await onFlush()) : EMPTY
-		},
-		free() {
-			if (done) return
-			done = true
-			onFree?.()
+	let fn = async (data) => {
+		if (data) {
+			if (done) throw Error('Encoder already freed')
+			let ch = channels(data)
+			try { return norm(await onEncode(ch)) }
+			catch (e) { done = true; onFree?.(); throw e }
 		}
+		// no args = end of stream
+		if (done) return EMPTY
+		done = true
+		try {
+			let result = onFlush ? norm(await onFlush()) : EMPTY
+			onFree?.()
+			return result
+		} catch (e) { onFree?.(); throw e }
 	}
+	// TODO: remove .encode in next major
+	fn.encode = fn
+	fn.flush = async () => {
+		if (done) return EMPTY
+		return onFlush ? norm(await onFlush()) : EMPTY
+	}
+	fn.free = () => {
+		if (done) return
+		done = true
+		onFree?.()
+	}
+	return fn
 }
 
 // ensure Uint8Array
@@ -123,4 +129,3 @@ function merge(a, b) {
 	out.set(b, a.length)
 	return out
 }
-

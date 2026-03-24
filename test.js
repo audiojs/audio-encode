@@ -23,7 +23,7 @@ async function getLena() {
 
 // --- format round-trip tests with lena ---
 
-t('wav round-trip (lena)', async () => {
+t('wav round-trip', async () => {
 	let { channelData, sampleRate } = await getLena()
 	let buf = await encode.wav(channelData, { sampleRate })
 	ok(buf.length > 44, 'has data')
@@ -33,7 +33,7 @@ t('wav round-trip (lena)', async () => {
 	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.001, 'rms matches')
 })
 
-t('aiff encode (lena)', async () => {
+t('aiff encode', async () => {
 	let { channelData, sampleRate } = await getLena()
 	let buf = await encode.aiff(channelData, { sampleRate })
 	ok(buf.length > 54, 'has data')
@@ -43,7 +43,7 @@ t('aiff encode (lena)', async () => {
 	is(dv.getInt16(20, false), 1, 'mono')
 })
 
-t('mp3 round-trip (lena)', async () => {
+t('mp3 round-trip', async () => {
 	let { channelData, sampleRate } = await getLena()
 	let buf = await encode.mp3(channelData, { sampleRate, channels: 1, bitrate: 128 })
 	ok(buf.length > 0)
@@ -52,7 +52,7 @@ t('mp3 round-trip (lena)', async () => {
 	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.05, 'rms within lossy tolerance')
 })
 
-t('ogg round-trip (lena)', async () => {
+t('ogg round-trip', async () => {
 	let { channelData, sampleRate } = await getLena()
 	let buf = await encode.ogg(channelData, { sampleRate, channels: 1, quality: 5 })
 	ok(buf.length > 0)
@@ -61,7 +61,7 @@ t('ogg round-trip (lena)', async () => {
 	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.05, 'rms within lossy tolerance')
 })
 
-t('flac round-trip (lena)', async () => {
+t('flac round-trip', async () => {
 	let { channelData, sampleRate } = await getLena()
 	let buf = await encode.flac(channelData, { sampleRate })
 	ok(buf.length > 0)
@@ -71,16 +71,24 @@ t('flac round-trip (lena)', async () => {
 	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.001, 'rms near-identical (lossless)')
 })
 
-t('opus round-trip (lena)', async () => {
+t('opus round-trip', async () => {
 	let { channelData, sampleRate } = await getLena()
 	let buf = await encode.opus(channelData, { sampleRate, channels: 1, bitrate: 96 })
 	ok(buf.length > 0)
 	let dec = await decode(buf)
-	is(dec.sampleRate, 48000) // opus always decodes at 48kHz
+	is(dec.sampleRate, 48000)
 	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.05, 'rms within lossy tolerance')
 })
 
-t('wav streaming', async () => {
+t('streaming (callable)', async () => {
+	let enc = await encode.wav({ sampleRate: 44100 })
+	let c1 = await enc(sine(44100, 440, 0.5))
+	let c2 = await enc(sine(44100, 440, 0.5))
+	let final = await enc()
+	ok(c1.length > 0 || c2.length > 0 || final.length > 0)
+})
+
+t('streaming (deprecated .stream/.encode)', async () => {
 	let enc = await encode.wav.stream({ sampleRate: 44100 })
 	let c1 = await enc.encode(sine(44100, 440, 0.5))
 	let c2 = await enc.encode(sine(44100, 440, 0.5))

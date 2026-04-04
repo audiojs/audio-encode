@@ -1,5 +1,5 @@
 {
-  "name": "@audio/opus-encode",
+  "name": "@audio/encode-opus",
   "version": "1.0.0",
   "description": "Encode PCM audio samples to Ogg Opus format via WASM",
   "type": "module",
@@ -27,11 +27,11 @@
   },
   "license": "MIT",
   "author": "audiojs",
-  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/opus-encode",
+  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/encode-opus",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/audiojs/audio-encode.git",
-    "directory": "packages/opus-encode"
+    "directory": "packages/encode-opus"
   },
   "engines": {
     "node": ">=16"

@@ -1,22 +1,22 @@
 {
-  "name": "@audio/mp3-encode",
+  "name": "@audio/encode-ogg",
   "version": "1.0.0",
-  "description": "Encode PCM audio samples to MP3 format via WASM",
+  "description": "Encode PCM audio samples to OGG Vorbis format via WASM",
   "type": "module",
-  "main": "mp3-encode.js",
-  "types": "mp3-encode.d.ts",
+  "main": "ogg-encode.js",
+  "types": "ogg-encode.d.ts",
   "exports": {
-    ".": "./mp3-encode.js",
+    ".": "./ogg-encode.js",
     "./package.json": "./package.json"
   },
   "files": [
-    "mp3-encode.js",
-    "mp3-encode.d.ts",
+    "ogg-encode.js",
+    "ogg-encode.d.ts",
     "LICENSE"
   ],
   "keywords": [
-    "mp3",
-    "lame",
+    "ogg",
+    "vorbis",
     "audio",
     "encode",
     "encoder",
@@ -27,11 +27,11 @@
   },
   "license": "MIT",
   "author": "audiojs",
-  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/mp3-encode",
+  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/encode-ogg",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/audiojs/audio-encode.git",
-    "directory": "packages/mp3-encode"
+    "directory": "packages/encode-ogg"
   },
   "engines": {
     "node": ">=16"

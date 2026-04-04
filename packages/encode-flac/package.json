@@ -1,22 +1,22 @@
 {
-  "name": "@audio/ogg-encode",
+  "name": "@audio/encode-flac",
   "version": "1.0.0",
-  "description": "Encode PCM audio samples to OGG Vorbis format via WASM",
+  "description": "Encode PCM audio samples to FLAC format via WASM",
   "type": "module",
-  "main": "ogg-encode.js",
-  "types": "ogg-encode.d.ts",
+  "main": "flac-encode.js",
+  "types": "flac-encode.d.ts",
   "exports": {
-    ".": "./ogg-encode.js",
+    ".": "./flac-encode.js",
     "./package.json": "./package.json"
   },
   "files": [
-    "ogg-encode.js",
-    "ogg-encode.d.ts",
+    "flac-encode.js",
+    "flac-encode.d.ts",
     "LICENSE"
   ],
   "keywords": [
-    "ogg",
-    "vorbis",
+    "flac",
+    "lossless",
     "audio",
     "encode",
     "encoder",
@@ -27,11 +27,11 @@
   },
   "license": "MIT",
   "author": "audiojs",
-  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/ogg-encode",
+  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/encode-flac",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/audiojs/audio-encode.git",
-    "directory": "packages/ogg-encode"
+    "directory": "packages/encode-flac"
   },
   "engines": {
     "node": ">=16"
@@ -41,6 +41,6 @@
     "test": "node test.js"
   },
   "dependencies": {
-    "wasm-media-encoders": "^0.7.0"
+    "libflacjs": "^5.4.0"
   }
 }

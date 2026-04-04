@@ -16,12 +16,12 @@ const buf = await encode.wav(channelData, { sampleRate: 44100 });
 
 | Format | Package | Engine |
 |--------|---------|--------|
-| WAV | [@audio/wav-encode](https://npmjs.com/package/@audio/wav-encode) | JS |
-| MP3 | [@audio/mp3-encode](https://npmjs.com/package/@audio/mp3-encode) | WASM |
-| OGG Vorbis | [@audio/ogg-encode](https://npmjs.com/package/@audio/ogg-encode) | WASM |
-| Opus | [@audio/opus-encode](https://npmjs.com/package/@audio/opus-encode) | WASM |
-| FLAC | [@audio/flac-encode](https://npmjs.com/package/@audio/flac-encode) | WASM |
-| AIFF | [@audio/aiff-encode](https://npmjs.com/package/@audio/aiff-encode) | JS |
+| WAV | [@audio/encode-wav](https://npmjs.com/package/@audio/encode-wav) | JS |
+| MP3 | [@audio/encode-mp3](https://npmjs.com/package/@audio/encode-mp3) | WASM |
+| OGG Vorbis | [@audio/encode-ogg](https://npmjs.com/package/@audio/encode-ogg) | WASM |
+| Opus | [@audio/encode-opus](https://npmjs.com/package/@audio/encode-opus) | WASM |
+| FLAC | [@audio/encode-flac](https://npmjs.com/package/@audio/encode-flac) | WASM |
+| AIFF | [@audio/encode-aiff](https://npmjs.com/package/@audio/encode-aiff) | JS |
 
 ### Whole-file encode
 

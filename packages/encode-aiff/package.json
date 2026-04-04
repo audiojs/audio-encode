@@ -1,23 +1,21 @@
 {
-  "name": "@audio/wav-encode",
+  "name": "@audio/encode-aiff",
   "version": "1.0.0",
-  "description": "Encode PCM audio samples to WAV format",
+  "description": "Encode PCM audio samples to AIFF format",
   "type": "module",
-  "main": "wav-encode.js",
-  "types": "wav-encode.d.ts",
+  "main": "aiff-encode.js",
+  "types": "aiff-encode.d.ts",
   "exports": {
-    ".": "./wav-encode.js",
+    ".": "./aiff-encode.js",
     "./package.json": "./package.json"
   },
   "files": [
-    "wav-encode.js",
-    "wav-encode.d.ts",
+    "aiff-encode.js",
+    "aiff-encode.d.ts",
     "LICENSE"
   ],
   "keywords": [
-    "wav",
-    "wave",
-    "riff",
+    "aiff",
     "audio",
     "encode",
     "encoder",
@@ -28,11 +26,11 @@
   },
   "license": "MIT",
   "author": "audiojs",
-  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/wav-encode",
+  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/encode-aiff",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/audiojs/audio-encode.git",
-    "directory": "packages/wav-encode"
+    "directory": "packages/encode-aiff"
   },
   "engines": {
     "node": ">=16"

@@ -24,12 +24,12 @@ function reg(name, load) {
 	})
 }
 
-reg('wav', () => import('@audio/wav-encode'))
-reg('aiff', () => import('@audio/aiff-encode'))
-reg('mp3', () => import('@audio/mp3-encode'))
-reg('ogg', () => import('@audio/ogg-encode'))
-reg('flac', () => import('@audio/flac-encode'))
-reg('opus', () => import('@audio/opus-encode'))
+reg('wav', () => import('@audio/encode-wav'))
+reg('aiff', () => import('@audio/encode-aiff'))
+reg('mp3', () => import('@audio/encode-mp3'))
+reg('ogg', () => import('@audio/encode-ogg'))
+reg('flac', () => import('@audio/encode-flac'))
+reg('opus', () => import('@audio/encode-opus'))
 
 /**
  * Wrap a stream factory into whole-file encoder + streaming

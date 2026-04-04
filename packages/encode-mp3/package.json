@@ -1,22 +1,22 @@
 {
-  "name": "@audio/flac-encode",
+  "name": "@audio/encode-mp3",
   "version": "1.0.0",
-  "description": "Encode PCM audio samples to FLAC format via WASM",
+  "description": "Encode PCM audio samples to MP3 format via WASM",
   "type": "module",
-  "main": "flac-encode.js",
-  "types": "flac-encode.d.ts",
+  "main": "mp3-encode.js",
+  "types": "mp3-encode.d.ts",
   "exports": {
-    ".": "./flac-encode.js",
+    ".": "./mp3-encode.js",
     "./package.json": "./package.json"
   },
   "files": [
-    "flac-encode.js",
-    "flac-encode.d.ts",
+    "mp3-encode.js",
+    "mp3-encode.d.ts",
     "LICENSE"
   ],
   "keywords": [
-    "flac",
-    "lossless",
+    "mp3",
+    "lame",
     "audio",
     "encode",
     "encoder",
@@ -27,11 +27,11 @@
   },
   "license": "MIT",
   "author": "audiojs",
-  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/flac-encode",
+  "homepage": "https://github.com/audiojs/audio-encode/tree/main/packages/encode-mp3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/audiojs/audio-encode.git",
-    "directory": "packages/flac-encode"
+    "directory": "packages/encode-mp3"
   },
   "engines": {
     "node": ">=16"
@@ -41,6 +41,6 @@
     "test": "node test.js"
   },
   "dependencies": {
-    "libflacjs": "^5.4.0"
+    "wasm-media-encoders": "^0.7.0"
   }
 }

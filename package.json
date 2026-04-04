@@ -27,7 +27,7 @@
   "scripts": {
     "test": "node test.js",
     "test:all": "npm test --workspaces && npm test",
-    "publish:all": "npm publish --workspaces && npm publish",
+    "publish:all": "npm publish --workspaces && npm publish"
   },
   "repository": {
     "type": "git",

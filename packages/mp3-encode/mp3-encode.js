@@ -16,7 +16,8 @@ import { createMp3Encoder } from 'wasm-media-encoders'
  * free() → void
  */
 export default async function mp3(opts) {
-	let { sampleRate, bitrate = 128, quality, channels = 2 } = opts
+	let { sampleRate, bitrate = 128, quality, channels } = opts
+	if (!channels || channels < 1 || channels > 2) channels = 2
 
 	let encoder = await createMp3Encoder()
 

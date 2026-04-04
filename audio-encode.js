@@ -44,7 +44,7 @@ function fmt(init) {
 		if (!opts.sampleRate) throw Error('sampleRate is required')
 		let ch = channels(data)
 		if (!ch.length || !ch[0].length) return EMPTY
-		let enc = await init(opts)
+		let enc = await init({ channels: ch.length, ...opts })
 		try {
 			let result = await enc(ch)
 			let flushed = await enc()

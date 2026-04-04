@@ -119,3 +119,22 @@ t('AudioBuffer input', async () => {
 	is(dec.sampleRate, 44100)
 	almost(rms(dec.channelData[0]), rms(ch), 0.001, 'rms matches')
 })
+
+t('mp3 mono — channels inferred from data', async () => {
+	let mono = sine(44100, 440, 0.5)  // 1 channel
+	let buf = await encode.mp3(mono, { sampleRate: 44100, bitrate: 128 })
+	ok(buf.length > 0, 'encoded without error')
+	// verify MP3 frame header says mono (channel mode = 3)
+	for (let i = 0; i < buf.length - 4; i++) {
+		if (buf[i] === 0xff && (buf[i + 1] & 0xe0) === 0xe0) {
+			is((buf[i + 3] >> 6) & 3, 3, 'MP3 frame is mono')
+			break
+		}
+	}
+})
+
+t('ogg mono — channels inferred from data', async () => {
+	let mono = sine(44100, 440, 0.5)
+	let buf = await encode.ogg(mono, { sampleRate: 44100 })
+	ok(buf.length > 0, 'encoded without error')
+})

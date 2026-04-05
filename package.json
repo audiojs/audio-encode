@@ -1,6 +1,6 @@
 {
   "name": "encode-audio",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Encode audio data in node or browser",
   "type": "module",
   "main": "audio-encode.js",

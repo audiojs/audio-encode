@@ -29,3 +29,14 @@ t('VBR mode', async () => {
 	let buf = enc.flush()
 	ok(buf.length > 0)
 })
+
+t('large stereo (30min 48kHz)', async () => {
+	let sr = 48000, dur = 1800, n = sr * dur
+	let ch = new Float32Array(n)
+	for (let i = 0; i < n; i++) ch[i] = 0.3 * Math.sin(2 * Math.PI * 440 * i / sr)
+	let enc = await mp3({ sampleRate: sr, channels: 2, bitrate: 128 })
+	let out = enc.encode([ch, new Float32Array(ch)])
+	ok(out.length > 0, 'has encoded data: ' + (out.length / 1e6).toFixed(1) + 'MB')
+	let final = enc.flush()
+	ok(out.length + final.length > 1e6, 'total > 1MB')
+})

@@ -27,12 +27,31 @@ export default async function mp3(opts) {
 
 	encoder.configure(cfg)
 
+	// WASM encoder has ~320MB/channel buffer limit.
+	// Chunk large inputs in 1152*1024 (~1.18M) sample blocks.
+	const CHUNK = 1152 * 1024
+
 	return { encode, flush, free }
 
 	function encode(ch) {
-		// returned buffer is owned by encoder — must copy
-		let raw = encoder.encode(ch)
-		return new Uint8Array(raw)
+		let n = ch[0].length
+		if (n <= CHUNK) {
+			let raw = encoder.encode(ch)
+			return new Uint8Array(raw)
+		}
+		let parts = []
+		for (let i = 0; i < n; i += CHUNK) {
+			let end = Math.min(i + CHUNK, n)
+			let slice = ch.map(c => c.subarray(i, end))
+			let raw = encoder.encode(slice)
+			if (raw.length) parts.push(new Uint8Array(raw))
+		}
+		let total = 0
+		for (let p of parts) total += p.length
+		let out = new Uint8Array(total)
+		let off = 0
+		for (let p of parts) { out.set(p, off); off += p.length }
+		return out
 	}
 
 	function flush() {

@@ -3,6 +3,7 @@
   "version": "1.2.1",
   "description": "Encode audio data in node or browser",
   "type": "module",
+  "sideEffects": false,
   "main": "audio-encode.js",
   "types": "audio-encode.d.ts",
   "exports": {

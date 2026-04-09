@@ -1,6 +1,5 @@
 import t, { is, ok, almost } from 'tst'
 import encode from './audio-encode.js'
-import encodeStream from './stream.js'
 import decode from 'audio-decode'
 import AudioBuffer from 'audio-buffer'
 
@@ -89,24 +88,22 @@ t('streaming (callable)', async () => {
 	ok(c1.length > 0 || c2.length > 0 || final.length > 0)
 })
 
-t('streaming (deprecated .stream/.encode)', async () => {
-	let enc = await encode.wav.stream({ sampleRate: 44100 })
-	let c1 = await enc.encode(sine(44100, 440, 0.5))
-	let c2 = await enc.encode(sine(44100, 440, 0.5))
-	let final = await enc.encode()
-	ok(c1.length > 0 || c2.length > 0 || final.length > 0)
-})
-
-t('TransformStream', async () => {
+t('encode.wav(source, opts) chunked', async () => {
 	let chunks = [sine(44100, 440, 0.5), sine(44100, 440, 0.5)]
-	let source = new ReadableStream({
-		pull(ctrl) { chunks.length ? ctrl.enqueue(chunks.shift()) : ctrl.close() }
-	})
+	async function* source() { for (let c of chunks) yield c }
 	let out = []
-	let dest = new WritableStream({ write(chunk) { out.push(chunk) } })
-	await source.pipeThrough(encodeStream('wav', { sampleRate: 44100 })).pipeTo(dest)
+	for await (let buf of encode.wav(source(), { sampleRate: 44100 })) out.push(buf)
 	ok(out.length > 0, 'produced chunks')
 	ok(out.every(c => c instanceof Uint8Array), 'all Uint8Array')
+})
+
+t('encode(format, data) whole-file', async () => {
+	let { channelData, sampleRate } = await getLena()
+	let buf = await encode('wav', channelData, { sampleRate })
+	ok(buf.length > 44, 'has data')
+	let dec = await decode(buf)
+	is(dec.sampleRate, sampleRate)
+	almost(rms(dec.channelData[0]), rms(channelData[0]), 0.001, 'rms matches')
 })
 
 t('AudioBuffer input', async () => {

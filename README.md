@@ -54,15 +54,19 @@ const c = await enc(null);        // end of stream — flush + free
 // explicit control: enc.flush(), enc.free()
 ```
 
-### TransformStream
+### Streaming
+
+Pass an async iterable as data — returns an async generator:
 
 ```js
-import encodeStream from 'encode-audio/stream';
+import encode from 'encode-audio'
 
-audioSource
-  .pipeThrough(encodeStream('mp3', { sampleRate: 44100, bitrate: 128 }))
-  .pipeTo(destination);
+for await (let buf of encode.mp3(audioSource, { sampleRate: 44100, bitrate: 128 })) {
+  // buf is Uint8Array
+}
 ```
+
+Works with any async iterable source.
 
 ### Options
 

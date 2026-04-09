@@ -23,8 +23,6 @@ export interface StreamEncoder {
 	(channelData: AudioInput): Promise<Uint8Array>;
 	/** Flush remaining data, finalize, and free resources. */
 	(): Promise<Uint8Array>;
-	/** @deprecated Use enc() instead. */
-	encode(channelData?: AudioInput): Promise<Uint8Array>;
 	/** Flush without freeing. */
 	flush(): Promise<Uint8Array>;
 	/** Free resources without flushing. */
@@ -34,13 +32,20 @@ export interface StreamEncoder {
 export interface FormatEncoder {
 	/** Whole-file encode. */
 	(channelData: AudioInput, opts: EncodeOptions): Promise<Uint8Array>;
+	/** Chunked encode from async iterable. */
+	(source: AsyncIterable<AudioInput>, opts: EncodeOptions): AsyncGenerator<Uint8Array>;
 	/** Create streaming encoder. */
 	(opts: EncodeOptions): Promise<StreamEncoder>;
-	/** @deprecated Use encode.fmt(opts) instead. */
-	stream(opts: EncodeOptions): Promise<StreamEncoder>;
 }
 
 declare const encode: {
+	/** Whole-file encode. */
+	(format: string, channelData: AudioInput, opts: EncodeOptions): Promise<Uint8Array>;
+	/** Chunked encode from async iterable. */
+	(format: string, source: AsyncIterable<AudioInput>, opts: EncodeOptions): AsyncGenerator<Uint8Array>;
+	/** Create streaming encoder. */
+	(format: string, opts: EncodeOptions): Promise<StreamEncoder>;
+
 	wav: FormatEncoder;
 	aiff: FormatEncoder;
 	mp3: FormatEncoder;
@@ -51,6 +56,13 @@ declare const encode: {
 };
 
 export default encode;
+
+/** Chunked encode from async iterable. */
+export function encodeChunked(
+	source: AsyncIterable<AudioInput>,
+	format: string,
+	opts: EncodeOptions
+): AsyncGenerator<Uint8Array>;
 
 /** Wrap codec callbacks into a StreamEncoder with lifecycle management. */
 export function streamEncoder(

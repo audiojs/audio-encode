@@ -1,8 +1,10 @@
 /**
- * Audio encoder: whole-file and streaming
+ * Audio encoder: whole-file and chunked
  * @module encode-audio
  *
  * let buf = await encode.wav(channelData, { sampleRate: 44100 })
+ *
+ * for await (let bytes of encode.mp3(source, { sampleRate: 44100 })) { ... }
  *
  * let enc = await encode.mp3({ sampleRate: 44100, bitrate: 128 })
  * let chunk = await enc(channelData)
@@ -11,13 +13,46 @@
 
 const EMPTY = new Uint8Array(0)
 
-const encode = {}
+/**
+ * Encode audio — delegates to format-specific encoder.
+ * encode('wav', channelData, { sampleRate })      → Promise<Uint8Array>
+ * encode('wav', source(), { sampleRate })          → AsyncGenerator<Uint8Array>
+ * encode('wav', { sampleRate })                    → Promise<StreamEncoder>
+ */
+function encode(format, data, opts) {
+	if (!encode[format]) throw Error('Unknown format: ' + format)
+	return encode[format](data, opts)
+}
 export default encode
+
+function isAudioData(d) {
+	return d instanceof Float32Array || Array.isArray(d) || (d?.getChannelData && d?.numberOfChannels)
+}
+
+/**
+ * Encode a stream of PCM chunks to the given format.
+ * @param {AsyncIterable<Float32Array[]|Float32Array>} source
+ * @param {string} format
+ * @param {object} opts - encoder options (sampleRate required)
+ * @returns {AsyncGenerator<Uint8Array>}
+ */
+async function* encodeChunked(source, format, opts) {
+	let enc = await encode[format](opts)
+	try {
+		for await (let chunk of source) {
+			let buf = await enc(chunk)
+			if (buf.length) yield buf
+		}
+		let final = await enc()
+		if (final.length) yield final
+	} catch (e) { enc.free(); throw e }
+}
+export { encodeChunked }
 
 // --- format registration ---
 
 function reg(name, load) {
-	encode[name] = fmt(async (opts) => {
+	encode[name] = fmt(name, async (opts) => {
 		let init = (await load()).default
 		let codec = await init(opts)
 		return streamEncoder(ch => codec.encode(ch), () => codec.flush(), () => codec.free())
@@ -36,24 +71,29 @@ reg('opus', () => import('@audio/encode-opus'))
  * 1 arg (opts) → streaming encoder function
  * 2 args (data, opts) → whole-file encode
  */
-function fmt(init) {
-	let fn = async (data, opts) => {
+function fmt(name, init) {
+	let fn = (data, opts) => {
 		// 1 arg = streaming: encode.mp3({ sampleRate })
 		if (!opts) return init(data)
+		// 2 args, async iterable = chunked: encode.mp3(source(), { sampleRate })
+		if (data && (typeof data[Symbol.asyncIterator] === 'function' || typeof data[Symbol.iterator] === 'function' && !isAudioData(data)))
+			return encodeChunked(data, name, opts)
 		// 2 args = whole-file: encode.mp3(channelData, { sampleRate })
-		if (!opts.sampleRate) throw Error('sampleRate is required')
-		let ch = channels(data)
-		if (!ch.length || !ch[0].length) return EMPTY
-		let enc = await init({ channels: ch.length, ...opts })
-		try {
-			let result = await enc(ch)
-			let flushed = await enc()
-			return merge(result, flushed)
-		} catch (e) { enc.free(); throw e }
+		return wholeFile(data, opts, init)
 	}
-	// TODO: remove .stream in next major
-	fn.stream = init
 	return fn
+}
+
+async function wholeFile(data, opts, init) {
+	if (!opts.sampleRate) throw Error('sampleRate is required')
+	let ch = channels(data)
+	if (!ch.length || !ch[0].length) return EMPTY
+	let enc = await init({ channels: ch.length, ...opts })
+	try {
+		let result = await enc(ch)
+		let flushed = await enc()
+		return merge(result, flushed)
+	} catch (e) { enc.free(); throw e }
 }
 
 // normalize input to Float32Array[]
@@ -98,8 +138,6 @@ export function streamEncoder(onEncode, onFlush, onFree) {
 			return result
 		} catch (e) { onFree?.(); throw e }
 	}
-	// TODO: remove .encode in next major
-	fn.encode = fn
 	fn.flush = async () => {
 		if (done) return EMPTY
 		return onFlush ? norm(await onFlush()) : EMPTY

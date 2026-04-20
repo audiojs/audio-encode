@@ -7,11 +7,13 @@
   "types": "mp3-encode.d.ts",
   "exports": {
     ".": "./mp3-encode.js",
+    "./meta": "./meta.js",
     "./package.json": "./package.json"
   },
   "files": [
     "mp3-encode.js",
     "mp3-encode.d.ts",
+    "meta.js",
     "LICENSE"
   ],
   "keywords": [

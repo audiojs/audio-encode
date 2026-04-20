@@ -7,11 +7,13 @@
   "types": "wav-encode.d.ts",
   "exports": {
     ".": "./wav-encode.js",
+    "./meta": "./meta.js",
     "./package.json": "./package.json"
   },
   "files": [
     "wav-encode.js",
     "wav-encode.d.ts",
+    "meta.js",
     "LICENSE"
   ],
   "keywords": [

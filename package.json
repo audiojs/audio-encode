@@ -13,6 +13,7 @@
       "default": "./audio-encode.js"
     },
     "./stream": "./stream.js",
+    "./meta": "./meta.js",
     "./package.json": "./package.json"
   },
   "files": [
@@ -20,6 +21,7 @@
     "audio-encode.d.ts",
     "stream.js",
     "stream.d.ts",
+    "meta.js",
     "LICENSE"
   ],
   "workspaces": [

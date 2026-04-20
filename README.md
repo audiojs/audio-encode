@@ -81,6 +81,30 @@ Works with any async iterable source.
 | `application` | `'audio'`, `'voip'`, or `'lowdelay'` | opus |
 
 
+### Metadata
+
+Splice tags, pictures, markers and regions into encoded bytes. Available for `wav`, `mp3`, `flac`.
+
+```js
+import encode from 'encode-audio'
+import { wav } from 'encode-audio/meta'
+
+let bytes = await encode.wav(channelData, { sampleRate: 44100 })
+let out = wav(bytes, {
+  meta: { title: 'Hare Krishna', artist: 'Prabhupada', year: '1966' },
+  markers: [{ sample: 44100, label: 'verse' }],
+  regions: [{ sample: 88200, length: 44100, label: 'chorus' }]
+})
+```
+
+Each codec sub-package also exposes its writer directly:
+
+```js
+import { writeMeta } from '@audio/encode-mp3/meta'
+let tagged = writeMeta(mp3Bytes, { meta: { title: 'foo' } })
+```
+
+
 ## See also
 
 * [audio-decode](https://github.com/audiojs/audio-decode) – decode any audio format to raw samples.

@@ -51,11 +51,36 @@ export { encodeChunked }
 
 // --- format registration ---
 
+// Lazy-loaded meta writers (per-format), keyed by format name. Loaded on first
+// use when `meta`/`markers`/`regions` is passed to that format's encoder.
+const META_WRITERS = {
+	wav: () => import('@audio/encode-wav/meta').then(m => m.writeMeta),
+	mp3: () => import('@audio/encode-mp3/meta').then(m => m.writeMeta),
+	flac: () => import('@audio/encode-flac/meta').then(m => m.writeMeta),
+}
+
 function reg(name, load) {
 	encode[name] = fmt(name, async (opts) => {
+		let { meta, markers, regions, ...rest } = opts || {}
 		let init = (await load()).default
-		let codec = await init(opts)
-		return streamEncoder(ch => codec.encode(ch), () => codec.flush(), () => codec.free())
+		let codec = await init(rest)
+		// No meta requested (or unsupported by format): pass through.
+		if (!META_WRITERS[name] || !(meta || markers?.length || regions?.length))
+			return streamEncoder(ch => codec.encode(ch), () => codec.flush(), () => codec.free())
+		// Meta requested: buffer encoder output, splice via writeMeta on flush.
+		let writeMeta = await META_WRITERS[name]()
+		let parts = []
+		return streamEncoder(
+			async ch => { let b = await codec.encode(ch); if (b?.length) parts.push(b); return EMPTY },
+			async () => {
+				let f = await codec.flush(); if (f?.length) parts.push(f)
+				let total = 0; for (let p of parts) total += p.length
+				let all = new Uint8Array(total), off = 0
+				for (let p of parts) { all.set(p, off); off += p.length }
+				return writeMeta(all, { meta: meta || {}, markers: markers || [], regions: regions || [] })
+			},
+			() => codec.free(),
+		)
 	})
 }
 

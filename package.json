@@ -1,6 +1,6 @@
 {
   "name": "encode-audio",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Encode audio data in node or browser",
   "type": "module",
   "sideEffects": false,
@@ -59,11 +59,11 @@
   "homepage": "https://github.com/audiojs/audio-encode#readme",
   "dependencies": {
     "@audio/encode-aiff": "^1.0.0",
-    "@audio/encode-flac": "^1.0.0",
-    "@audio/encode-mp3": "^1.0.0",
+    "@audio/encode-flac": "^1.1.0",
+    "@audio/encode-mp3": "^1.1.0",
     "@audio/encode-ogg": "^1.0.0",
     "@audio/encode-opus": "^1.0.0",
-    "@audio/encode-wav": "^1.0.0"
+    "@audio/encode-wav": "^1.1.0"
   },
   "devDependencies": {
     "audio-buffer": "^7.3.0",

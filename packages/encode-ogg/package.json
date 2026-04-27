@@ -1,6 +1,6 @@
 {
   "name": "@audio/encode-ogg",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Encode PCM audio samples to OGG Vorbis format via WASM",
   "type": "module",
   "main": "ogg-encode.js",

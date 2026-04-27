@@ -39,10 +39,10 @@
     "node": ">=16"
   },
   "bugs": "https://github.com/audiojs/audio-encode/issues",
-  "scripts": {
-    "test": "node test.js"
-  },
   "dependencies": {
     "libflacjs": "^5.4.0"
+  },
+  "scripts": {
+    "test": "node test.js"
   }
 }

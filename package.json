@@ -30,7 +30,8 @@
   "scripts": {
     "test": "node test.js",
     "test:all": "npm test --workspaces && npm test",
-    "publish:all": "npm publish --workspaces && npm publish"
+    "publish:all": "npm publish --workspaces && npm publish",
+    "build": "npm run build --workspaces --if-present"
   },
   "repository": {
     "type": "git",
@@ -69,6 +70,7 @@
     "audio-buffer": "^7.3.0",
     "audio-decode": "^4.0.0",
     "audio-lena": "^3.0.0",
+    "esbuild": "^0.28.0",
     "tst": "^9.2.2"
   }
 }

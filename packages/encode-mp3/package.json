@@ -40,7 +40,9 @@
   },
   "bugs": "https://github.com/audiojs/audio-encode/issues",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "build": "bash build.sh",
+    "prepack": "npm run build"
   },
   "dependencies": {
     "wasm-media-encoders": "^0.7.0"
